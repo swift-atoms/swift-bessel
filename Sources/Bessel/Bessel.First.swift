@@ -15,7 +15,7 @@ extension Bessel.First: Sendable {}
 extension Bessel.First {
     public func value(at x: Scalar) -> Scalar {
         guard !x.isNaN else { return .nan }
-        let n = UInt(order)
+        let n = UInt(Int(clamping: order))
         let flipped = n % 2 == 1 && x < 0
         let size = x.magnitude
         guard size.isFinite else { return 0 }
@@ -26,12 +26,12 @@ extension Bessel.First {
 
     public func slope(at x: Scalar) -> Scalar {
         let above = Self(order: order + 1).value(at: x)
-        guard UInt(order) > 0 else { return -above }
-        return (Self(order: Cardinal(UInt(order) - 1)).value(at: x) - above) / 2
+        guard UInt(Int(clamping: order)) > 0 else { return -above }
+        return (Self(order: Cardinal(UInt(Int(clamping: order)) - 1)).value(at: x) - above) / 2
     }
 
     public func zeros(_ count: Cardinal) -> [Scalar] {
-        let n = UInt(order)
+        let n = UInt(Int(clamping: order))
         let even = self
         var zeros: [Scalar] = []
         zeros.reserveCapacity(count)
