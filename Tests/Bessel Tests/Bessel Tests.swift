@@ -64,6 +64,14 @@ extension `Bessel Tests`.Values {
         #expect(Bessel.First<Double>(order: 2).value(at: .infinity) == 0)
     }
 
+    @Test func `Tiny arguments and large orders stay finite`() {
+        #expect(Bessel.First<Double>(order: 0).value(at: 1e-200) == 1)
+        #expect(Bessel.First<Double>(order: 1).value(at: 1e-200) == 0.5e-200)
+        #expect(Bessel.First<Float>(order: 3).value(at: 1e-30) == 0)
+        #expect(Bessel.First<Double>(order: 5_000_000).value(at: 2) == 0)
+        #expect(close(Bessel.First<Double>(order: 30).value(at: 10), 1.551096078257338e-12, within: 1e-10))
+    }
+
     @Test func `Single precision agrees with double`() {
         #expect((Double(Bessel.First<Float>(order: 2).value(at: 5)) - 0.04656511627775222).magnitude < 1e-6)
     }

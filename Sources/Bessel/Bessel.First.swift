@@ -20,7 +20,10 @@ extension Bessel.First {
         let size = x.magnitude
         guard size.isFinite else { return 0 }
         guard size > 0 else { return n == 0 ? 1 : 0 }
-        let value = size >= 25 && Scalar(n) <= size ? Self.forward(n, size) : Self.backward(n, size)
+        let value =
+            size * size < 4 * (Scalar(n) + 1)
+            ? Self.series(n, size)
+            : size >= 25 && Scalar(n) <= size ? Self.forward(n, size) : Self.backward(n, size)
         return flipped ? -value : value
     }
 
@@ -66,6 +69,26 @@ extension Bessel.First {
 }
 
 extension Bessel.First {
+    static func series(_ n: UInt, _ x: Scalar) -> Scalar {
+        let half = x / 2
+        var lead: Scalar = 1
+        var i: UInt = 1
+        while i <= n, lead != 0 {
+            lead *= half / Scalar(i)
+            i += 1
+        }
+        guard lead != 0 else { return 0 }
+        var term: Scalar = 1
+        var sum: Scalar = 1
+        var k: Scalar = 1
+        while term.magnitude > Scalar.ulpOfOne / 16 * sum.magnitude {
+            term *= -half * half / (k * (Scalar(n) + k))
+            sum += term
+            k += 1
+        }
+        return lead * sum
+    }
+
     static func asymptotic(_ x: Scalar) -> (zero: Scalar, one: Scalar) {
         func series(_ mu: Scalar) -> (p: Scalar, q: Scalar) {
             var p: Scalar = 1
@@ -115,7 +138,7 @@ extension Bessel.First {
     }
 
     static func backward(_ n: UInt, _ x: Scalar) -> Scalar {
-        let reach = Swift.max(Double(n), Double(x), 1)
+        let reach = Swift.min(Swift.max(Double(n), Double(x), 1), 1e15)
         let top = 2 * ((Int(reach) + 22 + Int((160 * reach).squareRoot())) / 2)
         let large = Scalar.greatestFiniteMagnitude.squareRoot() / 4
         var above: Scalar = 0
