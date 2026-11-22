@@ -1,0 +1,9 @@
+description: "Bessel functions of the first kind for Swift: the value, the slope and the zeros of J of any whole order."
+topics:
+  - primitives
+  - bessel
+  - special-functions
+  - mathematics
+homepage: "https://swift-institute.org"
+readme:
+  family: E

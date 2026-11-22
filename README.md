@@ -1,0 +1,10 @@
+# swift-bessel
+
+Use this package when you need a Bessel function of the first kind: the shape of a vibrating circular membrane, the far field of a round piston, the sidebands of a frequency-modulated tone. Start from `Bessel.First<Scalar>(order:)`, the function J of a whole order of zero or more, a `Cardinal` of swift-cardinal, and ask for its `value(at:)`, its `slope(at:)` or its first positive `zeros(_:)`. The scalar supplies `sin` and `cos` through `Trigonometry.Circular`; this package conforms no type. Orders that are not whole numbers, and the functions of the second kind, are not here yet.
+
+## Laws
+
+- `value(at:)` is J of the order at any real argument. At zero it is 1 for order zero and 0 for every other order. A negative argument flips the sign when the order is odd. A negative order is the caller's: it is the same function, with its sign flipped when the order is odd. An argument that is not a number gives not a number, and an infinite one gives 0.
+- For an argument of 25 or more and an order no larger than it, the value comes from Hankel's asymptotic series for orders zero and one, summed until its terms stop shrinking, then the upward recurrence. Everywhere else it comes from Miller's downward recurrence, started above the larger of the order and the argument and normalised by J₀ + 2 Σ J₂ₖ = 1. In `Double` both agree with published values to about twelve digits; the work grows in proportion to the larger of the order and the argument on the downward path and to the order on the upward one.
+- `slope(at:)` is the derivative, (J of the order below − J of the order above) / 2, and for order zero minus J of order one.
+- `zeros(_:)` gives the first positive zeros in rising order, none skipped: it walks up from the order (from one half for order zero) in steps of one half, which is shorter than the gap between any two zeros, and bisects each change of sign until the bracket is two neighbouring scalars, giving the upper one. A count of zero gives none.
